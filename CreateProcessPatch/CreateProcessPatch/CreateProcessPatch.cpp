@@ -49,6 +49,12 @@ void* ZwCreateUserProcess_f = (void*)GetProcAddress(
                                   GetModuleHandleW(L"ntdll.dll"),
                                   "ZwCreateUserProcess");
 
+LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)
+GetProcAddress(GetModuleHandleW(L"kernel32"), "IsWow64Process");
+
+
+GetNativeSystemInfo_t GetNativeSystemInfo_f = (GetNativeSystemInfo_t)GetProcAddress(
+	GetModuleHandleW(L"kernel32"), "GetNativeSystemInfo");
 
 /*
 TODO:
@@ -63,7 +69,7 @@ Consistent Variable Names
 
 int main(int argc, char* argv[])
 {
-    puts("\n"
+    printf("\n"
          "DbgChild - Create Process Patch\n"
          "-\n"
          "MIT License\n"
@@ -71,9 +77,20 @@ int main(int argc, char* argv[])
          "Copyright (c) <2017> <David Reguera Garcia aka Dreg>\n"
          "http://www.fr33project.org/\n"
          "https://github.com/David-Reguera-Garcia-Dreg\n"
-         "dreg@fr33project.org\n"
+         "dreg@fr33project.org\n\n"
+         "CreateProcessPatch_"
         );
 
+    if (Is64BitProcess(GetCurrentProcess()))
+    {
+        puts("x64");
+    }
+    else
+    {
+        puts("x32");
+    }
+
+    CreateProcessPatch(5124);
     if (argc > 1)
     {
         DWORD pid = atoi(argv[1]);
@@ -152,7 +169,7 @@ void CreateProcessPatch(DWORD pid)
                                   PROCESS_VM_WRITE |
                                   PROCESS_QUERY_INFORMATION, FALSE, pid);
 
-    printf("PID: %d\n", pid);
+    printf("PID: %d , Handle: 0x%X\n", pid, hProcess);
 
     if (hProcess)
     {
@@ -173,11 +190,33 @@ void CreateProcessPatch(DWORD pid)
         unsigned char* trampoline_ptr = NULL;
         DWORD payload_size = get_payload_size();
         void* payload_ep = get_payload_ep();
+        BOOL is_64_proc = Is64BitProcess(hProcess);
 
         puts(
-			"Process Openned!\n"
-			"Assuming the local NTDLL its equal to remote NTDLL (for disas etc)"
-		);
+            "Process Openned!\n"
+            "Assuming the local NTDLL its equal to remote NTDLL (for disas etc)"
+        );
+
+
+        printf("Remote process is: ");
+        if (is_64_proc)
+        {
+            puts("x64");
+        }
+        else
+        {
+            puts("x32");
+        }
+
+        if (is_64_proc != Is64BitProcess(GetCurrentProcess()))
+        {
+            fprintf(stderr, "Error, you must use:\n"
+                "CreateProcessPatch_x32 for x32 processes.\n"
+                "CreateProcessPatch_x64 for x64 processes.\n"
+            );
+            CloseHandle(hProcess);
+            return;
+        }
 
         printf(
             "NTDLL: 0x%" PRIXPTR "\n"
@@ -504,4 +543,25 @@ BOOL PatchCode(
 		&now_protect);
 
 	return TRUE;
+}
+
+BOOL Is64BitProcess(HANDLE process)
+{
+	BOOL isWow64 = FALSE;
+	SYSTEM_INFO si = { 0 };
+
+	if (GetNativeSystemInfo_f == NULL || fnIsWow64Process == NULL)
+	{
+		return FALSE;
+	}
+
+	GetNativeSystemInfo_f(&si);
+	if (si.wProcessorArchitecture != PROCESSOR_ARCHITECTURE_AMD64)
+	{
+		return FALSE;
+	}
+
+	fnIsWow64Process(process, &isWow64);
+
+	return isWow64 ? FALSE : TRUE;
 }

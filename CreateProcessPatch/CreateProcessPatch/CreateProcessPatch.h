@@ -83,11 +83,20 @@ typedef NTSTATUS(NTAPI* LdrGetProcedureAddress_t)(
     OUT PVOID*               FunctionAddress
 );
 
+typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+
+typedef void (WINAPI* GetNativeSystemInfo_t)(
+	_Out_ LPSYSTEM_INFO lpSystemInfo
+	);
+
+extern LPFN_ISWOW64PROCESS fnIsWow64Process;
+extern GetNativeSystemInfo_t GetNativeSystemInfo_f;
 extern LdrLoadDll_t LdrLoadDll_f;
 extern LdrGetProcedureAddress_t LdrGetProcedureAddress_f;
 extern RtlDosPathNameToRelativeNtPathName_U_t RtlDosPathNameToRelativeNtPathName_U_f;
 extern void* ZwCreateUserProcess_f;
 
+BOOL Is64BitProcess(HANDLE process);
 int TestLdrLoadDllLdrGetProcedureAddress();
 void TestPayloadInMyMemory();
 void CreateProcessPatch(DWORD pid);

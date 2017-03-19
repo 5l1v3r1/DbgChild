@@ -349,9 +349,11 @@ payload ENDP
 ; ------ COMMON PAYLOAD API
 
 get_payload_size PROC
+PUSH CBX
 LEA CAX, OFFSET end_payload
 LEA CBX, OFFSET init_payload
 SUB CAX, CBX
+POP CBX
 RET
 get_payload_size ENDP
 
