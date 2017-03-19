@@ -28,12 +28,17 @@
 ;
 
 IFDEF RAX
-
+CAX EQU RAX
+CBX EQU RBX
 ELSE
+CAX EQU EAX
+CBX EQU EBX
 .486
 .model flat, C
 option casemap:none 
 ENDIF
+
+; ------ COMMON PAYLOAD
 
 .code
 
@@ -62,30 +67,49 @@ dll_full_path      db    520 dup (?) ;
 dll_func_name_lbl::
 dll_func_name      db    520 dup (?) ;
 
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+; START DATA PASSED TO DLL IN CAX - DONT MODIFY THIS!!!
 trampoline_lbl::
 trampoline      db    80 dup (?) ;
 
 dll_work_full_path_lbl::
 dll_work_full_path      db    520 dup (?) ;
+; END START DATA PASSED TO DLL IN CAX
+
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+nop
 
 payload_ep_lbl:
 
 IFDEF RAX
 
 ; ------ x64 PAYLOAD
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
-nop
 
 push rbx
 push rcx
@@ -233,11 +257,9 @@ ret
 
 nop
 int 3
- 
-CAX EQU RAX
-CBX EQU RBX
 
 ELSE 
+
 ; ------ x86 PAYLOAD
 
 pushad
@@ -317,9 +339,6 @@ ret
 
 nop
 int 3
- 
-CAX EQU EAX
-CBX EQU EBX
 
 ENDIF
 
