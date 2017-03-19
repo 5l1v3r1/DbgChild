@@ -29,7 +29,11 @@
 
 IFDEF RAX
 
-; ------ x64 PAYLOAD
+ELSE
+.486
+.model flat, C
+option casemap:none 
+ENDIF
 
 .code
 
@@ -65,6 +69,10 @@ dll_work_full_path_lbl::
 dll_work_full_path      db    520 dup (?) ;
 
 payload_ep_lbl:
+
+IFDEF RAX
+
+; ------ x64 PAYLOAD
 
 nop
 nop
@@ -191,11 +199,7 @@ push [rax]
 lea rax, [rax-08h]
 push [rax]
 
-
 and rsp, not 8 ; align stack to 16 bytes prior to API call
-
-
-
 
 lea rax, trampoline
 call r11
@@ -229,103 +233,12 @@ ret
 
 nop
 int 3
-
-end_payload::
-
-payload ENDP
  
-get_payload_size PROC
-LEA RAX, OFFSET end_payload
-LEA RBX, OFFSET init_payload
-SUB RAX, RBX
-RET
-get_payload_size ENDP
+CAX EQU RAX
+CBX EQU RBX
 
-get_payload_ep PROC
-LEA RAX, OFFSET init_payload
-RET
-get_payload_ep ENDP
-
-get_payload_dll_str PROC
-LEA RAX, OFFSET dll_full_path_lbl
-RET
-get_payload_dll_str ENDP
-
-get_payload_dll_unicode_str PROC
-LEA RAX, OFFSET dll_unicode_string_lbl
-RET
-get_payload_dll_unicode_str ENDP
-
-get_payload_ldr_load_dll_sym PROC
-LEA RAX, OFFSET ldr_load_dll_sym_lbl
-RET
-get_payload_ldr_load_dll_sym ENDP
-
-get_payload_get_procedure_address PROC
-LEA RAX, OFFSET ldr_get_procedure_address_lbl
-RET
-get_payload_get_procedure_address ENDP
-
-get_payload_dll_func_name PROC
-LEA RAX, OFFSET dll_func_name_lbl
-RET
-get_payload_dll_func_name ENDP
-
-get_payload_dll_ansi_string PROC
-LEA RAX, OFFSET dll_ansi_string_lbl
-RET
-get_payload_dll_ansi_string ENDP
-
-get_trampoline PROC
-LEA RAX, OFFSET trampoline_lbl
-RET
-get_trampoline ENDP
-
-get_dll_work_full_path PROC
-LEA RAX, OFFSET dll_work_full_path_lbl
-RET
-get_dll_work_full_path ENDP
-
-
-
+ELSE 
 ; ------ x86 PAYLOAD
-
-ELSE
-.486
-.model flat, C
-option casemap:none 
-.code
-payload PROC
-init_payload::
-
-nop
-jmp payload_ep_lbl
-
-ldr_get_procedure_address_lbl::
-ldr_get_procedure_address db    8 dup(?) ;
-
-ldr_load_dll_sym_lbl::
-ldr_load_dll_sym db    8 dup(?) ;
-
-dll_unicode_string_lbl::
-dll_unicode_string      db    16 dup(?) ;
-
-dll_ansi_string_lbl::
-dll_ansi_string      db    16 dup(?) ;
-
-dll_full_path_lbl::
-dll_full_path      db    520 dup (?) ;
-
-dll_func_name_lbl::
-dll_func_name      db    520 dup (?) ;
-
-trampoline_lbl::
-trampoline      db    80 dup (?) ;
-
-dll_work_full_path_lbl::
-dll_work_full_path      db    520 dup (?) ;
-
-payload_ep_lbl:
 
 pushad
 pushfd
@@ -404,65 +317,67 @@ ret
 
 nop
 int 3
+ 
+CAX EQU EAX
+CBX EQU EBX
+
+ENDIF
 
 end_payload::
 
 payload ENDP
- 
+
 get_payload_size PROC
-LEA EAX, OFFSET end_payload
-LEA EBX, OFFSET init_payload
-SUB EAX, EBX
+LEA CAX, OFFSET end_payload
+LEA CBX, OFFSET init_payload
+SUB CAX, CBX
 RET
 get_payload_size ENDP
 
 get_payload_ep PROC
-LEA EAX, OFFSET init_payload
+LEA CAX, OFFSET init_payload
 RET
 get_payload_ep ENDP
 
 get_payload_dll_str PROC
-LEA EAX, OFFSET dll_full_path_lbl
+LEA CAX, OFFSET dll_full_path_lbl
 RET
 get_payload_dll_str ENDP
 
 get_payload_dll_unicode_str PROC
-LEA EAX, OFFSET dll_unicode_string_lbl
+LEA CAX, OFFSET dll_unicode_string_lbl
 RET
 get_payload_dll_unicode_str ENDP
 
 get_payload_ldr_load_dll_sym PROC
-LEA EAX, OFFSET ldr_load_dll_sym_lbl
+LEA CAX, OFFSET ldr_load_dll_sym_lbl
 RET
 get_payload_ldr_load_dll_sym ENDP
 
 get_payload_get_procedure_address PROC
-LEA EAX, OFFSET ldr_get_procedure_address_lbl
+LEA CAX, OFFSET ldr_get_procedure_address_lbl
 RET
 get_payload_get_procedure_address ENDP
 
 get_payload_dll_func_name PROC
-LEA EAX, OFFSET dll_func_name_lbl
+LEA CAX, OFFSET dll_func_name_lbl
 RET
 get_payload_dll_func_name ENDP
 
 get_payload_dll_ansi_string PROC
-LEA EAX, OFFSET dll_ansi_string_lbl
+LEA CAX, OFFSET dll_ansi_string_lbl
 RET
 get_payload_dll_ansi_string ENDP
 
 get_trampoline PROC
-LEA EAX, OFFSET trampoline_lbl
+LEA CAX, OFFSET trampoline_lbl
 RET
 get_trampoline ENDP
 
 get_dll_work_full_path PROC
-LEA EAX, OFFSET dll_work_full_path_lbl
+LEA CAX, OFFSET dll_work_full_path_lbl
 RET
 get_dll_work_full_path ENDP
-
-ENDIF
-
 
 	
 END
