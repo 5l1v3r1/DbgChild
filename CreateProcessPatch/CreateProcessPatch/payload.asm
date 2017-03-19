@@ -84,13 +84,13 @@ nop
 nop
 nop
 
-; START DATA PASSED TO DLL IN CAX - DONT MODIFY THIS!!!
+; START DATA PASSED TO DLL IN CAX - DONT MODIFY THIS!!! - THE DLL ASSUME THIS ORDER
 trampoline_lbl::
 trampoline      db    80 dup (?) ;
 
 dll_work_full_path_lbl::
 dll_work_full_path      db    520 dup (?) ;
-; END START DATA PASSED TO DLL IN CAX
+; -----
 
 nop
 nop
@@ -345,6 +345,8 @@ ENDIF
 end_payload::
 
 payload ENDP
+
+; ------ COMMON PAYLOAD API
 
 get_payload_size PROC
 LEA CAX, OFFSET end_payload
