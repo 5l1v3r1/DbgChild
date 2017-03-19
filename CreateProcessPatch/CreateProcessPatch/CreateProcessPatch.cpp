@@ -74,7 +74,6 @@ int main(int argc, char* argv[])
          "dreg@fr33project.org\n"
         );
 
-	CreateProcessPatch(10112);
     if (argc > 1)
     {
         DWORD pid = atoi(argv[1]);
