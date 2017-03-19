@@ -67,27 +67,27 @@ typedef BOOLEAN(NTAPI* RtlDosPathNameToRelativeNtPathName_U_t)(
     _Out_      PUNICODE_STRING NtFileName,
     _Out_opt_  PWSTR* FilePath,
     _Out_opt_  PRTL_RELATIVE_NAME RelativeName
-);
+    );
 
 typedef NTSTATUS(NTAPI* LdrLoadDll_t)(
     IN PWSTR SearchPath OPTIONAL,
     IN PULONG LoadFlags OPTIONAL,
     IN PUNICODE_STRING Name,
     OUT PVOID* BaseAddress OPTIONAL
-);
+    );
 
 typedef NTSTATUS(NTAPI* LdrGetProcedureAddress_t)(
     IN PVOID              ModuleHandle,
     IN PANSI_STRING         FunctionName OPTIONAL,
     IN WORD                 Oridinal OPTIONAL,
     OUT PVOID*               FunctionAddress
-);
+    );
 
 typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 
 typedef void (WINAPI* GetNativeSystemInfo_t)(
-	_Out_ LPSYSTEM_INFO lpSystemInfo
-	);
+    _Out_ LPSYSTEM_INFO lpSystemInfo
+    );
 
 extern LPFN_ISWOW64PROCESS fnIsWow64Process;
 extern GetNativeSystemInfo_t GetNativeSystemInfo_f;
@@ -101,18 +101,18 @@ int TestLdrLoadDllLdrGetProcedureAddress();
 void TestPayloadInMyMemory();
 void CreateProcessPatch(DWORD pid);
 void FillPayload(unsigned char* remote_payload,
-                 void* trampoline,
-                 size_t trampoline_size,
-                 WCHAR* dll_work_full_path);
+    void* trampoline,
+    size_t trampoline_size,
+    WCHAR* dll_work_full_path);
 size_t GetBytesInstructionsReplaced(void* address,
-                                    size_t bytes_to_replaced,
-                                    size_t max_bytes);
+    size_t bytes_to_replaced,
+    size_t max_bytes);
 BOOL MakePayloadPagesFullRights(void* payload_address, size_t size);
 BOOL PatchCode(HANDLE process,
-               void* address,
-               void* code,
-               SIZE_T code_size,
-               void* original_code);
+    void* address,
+    void* code,
+    SIZE_T code_size,
+    void* original_code);
 
 extern "C" void hello_world_asm();
 extern "C" DWORD get_payload_size();
